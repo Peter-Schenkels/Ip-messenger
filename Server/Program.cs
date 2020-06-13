@@ -56,7 +56,6 @@ namespace Server
                 return true;
         }
 
-
         static void bindSocket()
         {
             Console.WriteLine("Connecting");
@@ -65,17 +64,11 @@ namespace Server
             listener.Bind(new IPEndPoint(IPAddress.Any, port));
             listener.Listen(0);
         }
+
         static void Main(string[] args)
         {
-            try
-            {
-                bindSocket();
-                CreateServer();
-            }
-            catch { }
-
-            foreach (var client in Clients)
-                client.Thread.Abort();
+            bindSocket();
+            CreateServer();
         }
 
         static void Listeners(object Object)
@@ -94,6 +87,7 @@ namespace Server
                     {
                         listener.Close();
                         client.Socket.Close();
+                        client.Thread.Abort();
                     }
                 }
             }

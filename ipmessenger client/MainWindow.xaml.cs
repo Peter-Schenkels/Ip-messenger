@@ -137,8 +137,6 @@ namespace ipmessenger_client
                 {
                     chatbox.Items.Add(recievedMessage);
                 });
-
-
             }
             else
             {
@@ -163,14 +161,11 @@ namespace ipmessenger_client
             }
             socketThread = new Thread(new ThreadStart(Socketing));
             socketThread.Start();
-
-
-
         }
 
         private void Button_Send(object sender, RoutedEventArgs e)
         {
-            if (!Send(publicIPAddress + ": " + messageBox.Text ))
+            if (!Send(publicIPAddress + ": " + messageBox.Text))
             {
                 chatbox.Items.Add("Socket is not connected");
             }
