@@ -13,38 +13,38 @@ namespace Server
     class Server
     {
         [ThreadStatic]
-        public static Socket listener, acc;
+        public static Socket listener;
+
         private static int port = 1998;
-        private static string LocalIP = "127.0.0.1";
+        private static string LocalIP = "2.56.212.56";
         private static string messageRecieved;
         private static List<Client> Clients = new List<Client>();
 
         public class Client
-        { 
+        {
             public Socket Socket { get; set; }
+            public Thread Thread { get; set; }
         }
+
         static void CreateServer()
         {
             while (true)
             {
-                acc = listener.Accept();
+                var acc = listener.Accept();
                 Client client = new Client();
                 client.Socket = acc;
                 Clients.Add(client);
                 Console.WriteLine("Connecting new client");
                 ParameterizedThreadStart pts = new ParameterizedThreadStart(Listeners);
-                Thread thr = new Thread(pts);
-                thr.IsBackground = true;
-                thr.Start(client); //start client processing thread
-                acc = null;
-                client = null;
+                client.Thread = new Thread(pts);
+                client.Thread.IsBackground = true;
+                client.Thread.Start(client); //start client processing thread
             }
-
         }
 
         static bool SocketConnected(Socket s)
         {
-            if(s == null)
+            if (s == null)
             {
                 return false;
             }
@@ -67,8 +67,15 @@ namespace Server
         }
         static void Main(string[] args)
         {
-            bindSocket();
-            CreateServer();
+            try
+            {
+                bindSocket();
+                CreateServer();
+            }
+            catch { }
+
+            foreach (var client in Clients)
+                client.Thread.Abort();
         }
 
         static void Listeners(object Object)
@@ -90,25 +97,21 @@ namespace Server
                     }
                 }
             }
-
         }
 
         static void Send()
         {
-            if(messageRecieved != null)
+            if (messageRecieved != null)
             {
                 string msg = messageRecieved;
                 byte[] msgBuffer = Encoding.Default.GetBytes(msg);
-                foreach(Client client in Clients)
+                foreach (Client client in Clients)
                 {
                     client.Socket.Send(msgBuffer, 0, msgBuffer.Length, 0);
                 }
-                
+
             }
             messageRecieved = null;
-
-
-
         }
 
         static void Recieve(Socket client)
@@ -124,16 +127,6 @@ namespace Server
             {
                 Console.WriteLine("disconnected");
             }
-
         }
     }
-
-
-    class Client
-    {
-
-
-    }
-
-
 }

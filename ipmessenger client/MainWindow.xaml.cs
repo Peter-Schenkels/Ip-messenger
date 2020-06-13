@@ -40,8 +40,7 @@ namespace ipmessenger_client
             InitializeComponent();
             publicIPAddress = GetLocalIPAddress();
 
-
-
+            ipAddressBox.Text = ServerIP;
         }
 
         static string GetLocalIPAddress()
@@ -83,7 +82,7 @@ namespace ipmessenger_client
 
         Socket clientSocket;
         private int port = 1998;
-        private string LocalIP = "127.0.0.1";
+        private string ServerIP = "2.56.212.56";
 
 
         bool SocketConnected(Socket s)
@@ -105,7 +104,7 @@ namespace ipmessenger_client
             try
             {
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(LocalIP), port);
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(ServerIP), port);
                 clientSocket.Connect(endPoint);
             }
             catch
@@ -155,8 +154,8 @@ namespace ipmessenger_client
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            LocalIP = ipAddressBox.Text;
-            chatbox.Items.Add("Now connecting to ip: " + LocalIP);
+            ServerIP = ipAddressBox.Text;
+            chatbox.Items.Add("Now connecting to ip: " + ServerIP);
             if (socketThread != null)
             {
                 socketThread.Abort();
