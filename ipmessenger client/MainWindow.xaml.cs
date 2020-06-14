@@ -202,10 +202,7 @@
         {
             if (clientSocket?.Connected == true)
             {
-                foreach (var buf in buffer)
-                {
-                    Console.WriteLine(buf + " e");
-                }
+       
                 clientSocket.Send(buffer, 0, buffer.Length, 0);
                 return true;
             }
