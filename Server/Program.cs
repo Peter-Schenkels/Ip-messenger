@@ -16,8 +16,9 @@ namespace Server
         public static Socket listener;
 
         private static int port = 1998;
-        private static string LocalIP = "2.56.212.56";
-        private static string messageRecieved;
+        private static string LocalIP = "127.0.0.1";
+        private static byte[] messageRecieved = new byte[1000000];
+        private static bool newMessage = false;
         private static List<Client> Clients = new List<Client>();
 
         public class Client
@@ -95,27 +96,28 @@ namespace Server
 
         static void Send()
         {
-            if (messageRecieved != null)
+            if (newMessage)
             {
-                string msg = messageRecieved;
-                byte[] msgBuffer = Encoding.Default.GetBytes(msg);
                 foreach (Client client in Clients)
                 {
-                    client.Socket.Send(msgBuffer, 0, msgBuffer.Length, 0);
+                    client.Socket.Send(messageRecieved, 0, messageRecieved.Length, 0);
                 }
 
             }
-            messageRecieved = null;
+            newMessage = false;
         }
 
         static void Recieve(Socket client)
         {
             try
             {
-                byte[] buffer = new byte[255];
+                byte[] buffer = new byte[1000000];
                 int recieved = client.Receive(buffer, 0, buffer.Length, 0);
                 Array.Resize(ref buffer, recieved);
-                messageRecieved = Encoding.Default.GetString(buffer);
+                Array.Resize(ref messageRecieved, recieved);
+                Array.Copy(buffer, messageRecieved, buffer.Length);
+
+                newMessage = true;
             }
             catch
             {
