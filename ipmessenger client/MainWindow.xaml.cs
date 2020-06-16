@@ -140,8 +140,8 @@
         /// <summary>
         /// Defines the ServerIP.
         /// </summary>
+        //private string ServerIP = "2.56.212.56";
         private string ServerIP = "127.0.0.1";
-
         private MemoryStream ms;
 
         /// <summary>
@@ -213,40 +213,50 @@
         /// </summary>
         internal void Recieve()
         {
-            if (clientSocket.Connected)
+            try
             {
-                byte[] buffer = new byte[1000000];
-                int recieved = clientSocket.Receive(buffer, buffer.Length, SocketFlags.None);
-                Array.Resize(ref buffer, recieved);
-                if (buffer.Length == 0)
-                {
-                    return;
-                }
-                if (buffer[0] == 's')
-                {
-                    string recievedMessage = Encoding.Default.GetString(buffer);
-                    string str = recievedMessage.Substring(0, 3);
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        chatbox.Items.Insert(0, recievedMessage.Replace("str", ""));
-                    });
 
+
+
+                if (clientSocket.Connected)
+                {
+                    byte[] buffer = new byte[1000000];
+                    int recieved = clientSocket.Receive(buffer, buffer.Length, SocketFlags.None);
+                    Array.Resize(ref buffer, recieved);
+                    if (buffer.Length == 0)
+                    {
+                        return;
+                    }
+                    if (buffer[0] == 's')
+                    {
+                        string recievedMessage = Encoding.Default.GetString(buffer);
+                        string str = recievedMessage.Substring(0, 3);
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            chatbox.Items.Insert(0, recievedMessage.Replace("str", ""));
+                        });
+
+                    }
+                    else
+                    {
+
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            BitmapImage bitmap = LoadImage(buffer);
+                            Image newImage = new Image();
+                            newImage.Source = bitmap;
+                            chatbox.Items.Insert(0, newImage);
+                        });
+                    }
                 }
                 else
                 {
-            
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        BitmapImage bitmap = LoadImage(buffer);
-                        Image newImage = new Image();
-                        newImage.Source = bitmap;
-                        chatbox.Items.Insert(0, newImage);
-                    });
+                    chatbox.Items.Insert(0, "Not connected");
                 }
             }
-            else
+            catch
             {
-                chatbox.Items.Insert(0, "Not connected");
+                Console.WriteLine("Error");
             }
         }
 

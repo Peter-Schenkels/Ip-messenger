@@ -127,28 +127,26 @@
             Client client = (Client)Object;
             while (true)
             {
-                try
-                {
-                    if (SocketConnected(client.Socket))
-                    {
-                        Recieve(client.Socket);
-                        Send();
-                    }
-                    else
-                    {
-                        if (listener != null && client != null)
-                        {
-                            listener.Close();
 
-                            client.Socket.Close();
-                            client.Thread.Abort();
-                        }
+                if (client.Socket.Connected)
+                {
+                    Recieve(client.Socket);
+                    Send();
+                }
+                else
+                {
+                    if (listener != null && client != null)
+                    {
+                        listener.Close();
+                        client.Socket.Close();
+                        client.Thread.Abort();
+                    }
+                    else if(client != null)
+                    {
+                        client.Thread.Abort();
                     }
                 }
-                catch
-                {
-                    Console.WriteLine("client disconnect");
-                }
+                
             }
         }
 
